@@ -1,0 +1,9 @@
+git version 2.56.1
+Python 3.14.10
+cmake version 4.5.0
+GNU Make 4.4.1
+arm-none-eabi-gcc (Arch Repository) 16.2.0
+code 1.143.17232
+picotool v2.3.0 (Linux, GNU-16.2.1, Release)
+pico-sdk 2.3.0
+PICO_SDK_PATH=/home/scooter/Repositories/pico/pico-sdk
