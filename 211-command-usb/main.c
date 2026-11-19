@@ -49,10 +49,13 @@ void cmd_ping(void) { printf("pong\n"); }
 const struct command_t commands[] = {
     {"enable", cmd_enable},   {"disable", cmd_disable}, {"info", cmd_info},
     {"version", cmd_version}, {"ping", cmd_ping},       {"mem_info", mem_info},
+    {"fw_info", fw_info},
 };
 
+const uint command_count = sizeof(commands) / sizeof(commands[0]);
+
 void handle_command(const char *command) {
-  for (uint i = 0; i < COMMAND_COUNT; i++) {
+  for (uint i = 0; i < command_count; i++) {
     if (strcmp(command, commands[i].name) == 0) {
       if (commands[i].handler != NULL) {
         commands[i].handler();
