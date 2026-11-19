@@ -123,9 +123,8 @@ void fw_info(void) {
   printf("%-14s %-12s %-12s\n", "object", "address", "value");
 
   // main, fw_info  — адрес с признаком Thumb и два байта по сброшенному адресу
-  printf("%-14s 0x%08x  0x%04x\n", "main", (unsigned)main_code, *main_code);
-  printf("%-14s 0x%08x  0x%04x\n", "fw_info", (unsigned)fw_info_code,
-         *fw_info_code);
+  printf("%-14s 0x%08x  0x%04x\n", "main", (unsigned)main, *main_code);
+  printf("%-14s 0x%08x  0x%04x\n", "fw_info", (unsigned)fw_info, *fw_info_code);
 
   // commands       — адрес массива
   printf("%-14s 0x%08x\n", "commands", (unsigned)commands);
