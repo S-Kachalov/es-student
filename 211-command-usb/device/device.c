@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-info_t device_card = {1, "es-cmd-usb", 2};
+struct info_t device_card = {1, "es-cmd-usb", 2};
 
 void device_info(void) {
   char board_id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES * 2 + 1];
