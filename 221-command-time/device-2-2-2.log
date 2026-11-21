@@ -1,0 +1,63 @@
+задание: 2.2.2
+проект: 221-command-time
+устройство: 2e8a:000a
+серийный номер: 4250303938373408
+порт: /dev/ttyACM0
+начало: 2026-11-21T18:15:21
+   0.000 --> uptime
+   0.000 <-- uptime
+   0.001 <-- dbg read_line:77 got uptime
+   0.001 <-- uptime: 209549 ms
+   0.402 --> boot_info
+   0.402 <-- boot_info
+   0.403 <-- dbg read_line:77 got boot_info
+   0.403 <-- vector table    0x10000100
+   0.403 <-- stack top     0x20042000
+   0.403 <-- reset         0x100001f7
+   0.403 <-- reset (even)  0x100001f6
+   0.403 <-- gpio in         0xd0000004
+   0.404 <-- led bit       1
+   0.404 <-- gpio_get      1
+   0.805 --> uptime
+   0.805 <-- uptime
+   0.805 <-- dbg read_line:77 got uptime
+   0.805 <-- uptime: 210354 ms
+   1.206 --> boot_info
+   1.207 <-- boot_info
+   1.207 <-- dbg read_line:77 got boot_info
+   1.208 <-- vector table    0x10000100
+   1.208 <-- stack top     0x20042000
+   1.208 <-- reset         0x100001f7
+   1.208 <-- reset (even)  0x100001f6
+   1.208 <-- gpio in         0xd0000004
+   1.208 <-- led bit       1
+   1.208 <-- gpio_get      1
+   1.610 --> uptime
+   1.610 <-- uptime
+   1.610 <-- dbg read_line:77 got uptime
+   1.610 <-- uptime: 211159 ms
+   2.012 --> boot_info
+   2.012 <-- boot_info
+   2.012 <-- dbg read_line:77 got boot_info
+   2.012 <-- vector table    0x10000100
+   2.012 <-- stack top     0x20042000
+   2.013 <-- reset         0x100001f7
+   2.013 <-- reset (even)  0x100001f6
+   2.013 <-- gpio in         0xd0000004
+   2.013 <-- led bit       1
+   2.013 <-- gpio_get      1
+   2.414 --> uptime
+   2.414 <-- uptime
+   2.415 <-- dbg read_line:77 got uptime
+   2.415 <-- uptime: 211964 ms
+   2.816 --> boot_info
+   2.817 <-- boot_info
+   2.817 <-- dbg read_line:77 got boot_info
+   2.817 <-- vector table    0x10000100
+   2.817 <-- stack top     0x20042000
+   2.817 <-- reset         0x100001f7
+   2.817 <-- reset (even)  0x100001f6
+   2.818 <-- gpio in         0xd0000004
+   2.818 <-- led bit       0
+   2.818 <-- gpio_get      0
+итог: отправлено команд 8, принято строк 48

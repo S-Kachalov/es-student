@@ -1,7 +1,6 @@
 #include "clock.h"
 #include "command.h"
 #include "device.h"
-#include "hardware/gpio.h"
 #include "led.h"
 #include "log.h"
 #include "memory.h"
@@ -10,29 +9,19 @@
 
 #define LINE_SIZE 32
 
-const uint BUTTON_PIN = 15;
-const uint DEBOUNCE_MS = 20;
 char line[LINE_SIZE];
 uint line_length = 0;
 
-bool get_button_debounce(uint pin) {
-  bool state = gpio_get(pin);
-  sleep_ms(DEBOUNCE_MS);
-  return state && gpio_get(pin);
-}
+const uint BLINK_HALF_PERIOD_MS = 500;
+uint64_t last_toggle_us = 0;
 
-void cmd_enable(void) {
-  // включаем светодиод и сообщаем новое состояние
-  get_button_debounce(BUTTON_PIN);
-  led_set(true);
-  LOG_INF("led %s\n", led_is_on() ? "on" : "off");
-}
+void blink(void) {
+  uint64_t now_us = time_us_64();
 
-void cmd_disable(void) {
-  // выключаем светодиод и сообщаем новое состояние
-  get_button_debounce(BUTTON_PIN);
-  led_set(false);
-  LOG_INF("led %s\n", led_is_on() ? "on" : "off");
+  if (now_us - last_toggle_us >= BLINK_HALF_PERIOD_MS * 1000) {
+    last_toggle_us = now_us;
+    led_toggle();
+  }
 }
 
 void cmd_info(void) {
@@ -50,11 +39,11 @@ void cmd_ping(void) { printf("pong\n"); }
 void cmd_clk_info(void) { clk_info(); }
 
 const struct command_t commands[] = {
-    {"enable", cmd_enable},   {"disable", cmd_disable},
     {"info", cmd_info},       {"version", cmd_version},
     {"ping", cmd_ping},       {"mem_info", mem_info},
     {"fw_info", fw_info},     {"dev_info", dev_info},
     {"boot_info", boot_info}, {"clk_info", cmd_clk_info},
+    {"uptime", uptime},
 };
 
 const uint command_count = sizeof(commands) / sizeof(commands[0]);
@@ -103,11 +92,9 @@ void read_line(void) {
 int main() {
   stdio_init_all();
   led_init();
-  gpio_init(BUTTON_PIN);
-  gpio_set_dir(BUTTON_PIN, GPIO_IN);
-  gpio_pull_up(BUTTON_PIN);
 
   while (1) {
     read_line();
+    blink();
   }
 }
