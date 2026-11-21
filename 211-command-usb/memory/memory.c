@@ -1,6 +1,7 @@
 #include "command.h"
 #include "device.h"
 #include "hardware/regs/addressmap.h"
+#include "led.h"
 #include "pico/stdlib.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -18,6 +19,8 @@ extern char __bss_end__;
 extern char __HeapLimit;
 extern char __StackBottom;
 extern char __StackTop;
+
+#define VECTOR_TABLE 0x10000100
 
 uint32_t data_variable = 100;
 uint32_t bss_variable;
@@ -161,4 +164,37 @@ void fw_info(void) {
 
   // возвращаем блок кучи
   free(heap_variable);
+}
+
+void boot_info(void) {
+  // указатель на таблицу векторов и два первых слова из неё
+  const uint32_t *vectors = (const uint32_t *)VECTOR_TABLE;
+  uint32_t stack_top = vectors[0];
+  uint32_t reset_handler = vectors[1];
+
+  // указатель на регистр GPIO_IN и разряд вывода светодиода
+  volatile uint32_t *gpio_in = (uint32_t *)(0xd0000004);
+
+  // vector table   — адрес таблицы
+  printf("%-15s 0x%08x\n", "vector table", (unsigned)vectors);
+
+  //   stack top    — первое слово
+  printf("  %-13s 0x%08x\n", "stack top", (unsigned)vectors[0]);
+
+  //   reset        — второе слово
+  printf("  %-13s 0x%08x\n", "reset", (unsigned)vectors[1]);
+
+  //   reset (even) — оно же со сброшенным признаком Thumb
+  printf("  %-13s 0x%08x\n", "reset (even)",
+         (unsigned)((uintptr_t)vectors[1] & ~1u));
+
+  // gpio in        — адрес регистра
+  printf("%-15s 0x%08x\n", "gpio in", (unsigned)gpio_in);
+
+  //   led bit      — разряд из регистра
+  uint32_t level = (*gpio_in >> led_pin()) & 1u;
+  printf("  %-13s %u\n", "led bit", level);
+
+  //   gpio_get     — то же значение через SDK
+  printf("  %-13s %u\n", "led bit", gpio_get(led_pin()));
 }

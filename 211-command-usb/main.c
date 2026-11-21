@@ -47,9 +47,11 @@ void cmd_version(void) {
 void cmd_ping(void) { printf("pong\n"); }
 
 const struct command_t commands[] = {
-    {"enable", cmd_enable},   {"disable", cmd_disable}, {"info", cmd_info},
-    {"version", cmd_version}, {"ping", cmd_ping},       {"mem_info", mem_info},
+    {"enable", cmd_enable},   {"disable", cmd_disable},
+    {"info", cmd_info},       {"version", cmd_version},
+    {"ping", cmd_ping},       {"mem_info", mem_info},
     {"fw_info", fw_info},     {"dev_info", dev_info},
+    {"boot_info", boot_info},
 };
 
 const uint command_count = sizeof(commands) / sizeof(commands[0]);

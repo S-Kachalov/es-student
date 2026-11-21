@@ -1,0 +1,45 @@
+задание: 2.1.6
+проект: 211-command-usb
+устройство: 2e8a:000a
+серийный номер: 4250303938373408
+порт: /dev/ttyACM0
+начало: 2026-11-21T16:32:31
+   0.000 --> boot_info
+   0.001 <-- boot_info
+   0.001 <-- dbg read_line:85 got boot_info
+   0.001 <-- vector table    0x10000100
+   0.001 <-- stack top     0x20042000
+   0.001 <-- reset         0x100001f7
+   0.001 <-- reset (even)  0x100001f6
+   0.001 <-- gpio in         0xd0000004
+   0.001 <-- led bit       0
+   0.002 <-- led bit       0
+   2.005 --> enable
+   2.005 <-- enable
+   2.005 <-- dbg read_line:85 got enable
+   2.025 <-- inf cmd_enable:27 led on
+   4.029 --> boot_info
+   4.029 <-- boot_info
+   4.029 <-- dbg read_line:85 got boot_info
+   4.029 <-- vector table    0x10000100
+   4.030 <-- stack top     0x20042000
+   4.030 <-- reset         0x100001f7
+   4.030 <-- reset (even)  0x100001f6
+   4.030 <-- gpio in         0xd0000004
+   4.030 <-- led bit       1
+   4.030 <-- led bit       1
+   6.034 --> disable
+   6.034 <-- disable
+   6.034 <-- dbg read_line:85 got disable
+   6.054 <-- inf cmd_disable:34 led off
+   8.057 --> boot_info
+   8.057 <-- boot_info
+   8.057 <-- dbg read_line:85 got boot_info
+   8.058 <-- vector table    0x10000100
+   8.058 <-- stack top     0x20042000
+   8.058 <-- reset         0x100001f7
+   8.058 <-- reset (even)  0x100001f6
+   8.058 <-- gpio in         0xd0000004
+   8.058 <-- led bit       0
+   8.058 <-- led bit       0
+итог: отправлено команд 5, принято строк 33
