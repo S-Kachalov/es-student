@@ -196,5 +196,5 @@ void boot_info(void) {
   printf("  %-13s %u\n", "led bit", level);
 
   //   gpio_get     — то же значение через SDK
-  printf("  %-13s %u\n", "led bit", gpio_get(led_pin()));
+  printf("  %-13s %u\n", "gpio_get", gpio_get(led_pin()));
 }
