@@ -5,6 +5,8 @@
 #include "log.h"
 #include "memory.h"
 #include "pico/stdlib.h"
+#include "profiling.h"
+#include <stdio.h>
 #include <string.h>
 
 // прикидка: за член ряда 4 операции с double, 175 + 110 + 190 + 110 = 585
@@ -67,12 +69,29 @@ void cmd_calc_pi(void) {
   printf("time: %llu ms\n", spent_us / 1000);
 }
 
+void main_time_exec(void) {
+  printf("iteration avg %.2f us, max %u us\n", profiling_avg_us(),
+         (unsigned)profiling_max_us());
+}
+
+void main_time_reset(void) {
+  profiling_reset_max();
+  printf("max reset\n");
+}
+
 const struct command_t commands[] = {
-    {"info", cmd_info},       {"version", cmd_version},
-    {"ping", cmd_ping},       {"mem_info", mem_info},
-    {"fw_info", fw_info},     {"dev_info", dev_info},
-    {"boot_info", boot_info}, {"clk_info", cmd_clk_info},
-    {"uptime", uptime},       {"calc_pi", cmd_calc_pi},
+    {"info", cmd_info},
+    {"version", cmd_version},
+    {"ping", cmd_ping},
+    {"mem_info", mem_info},
+    {"fw_info", fw_info},
+    {"dev_info", dev_info},
+    {"boot_info", boot_info},
+    {"clk_info", cmd_clk_info},
+    {"uptime", uptime},
+    {"calc_pi", cmd_calc_pi},
+    {"main_time_exec", main_time_exec},
+    {"main_time_reset", main_time_reset},
 };
 
 const uint command_count = sizeof(commands) / sizeof(commands[0]);
@@ -121,8 +140,10 @@ void read_line(void) {
 int main() {
   stdio_init_all();
   led_init();
+  profiling_init();
 
   while (1) {
+    profiling_iteration();
     read_line();
     blink();
   }
