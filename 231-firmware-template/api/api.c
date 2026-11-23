@@ -1,12 +1,13 @@
 #include "api/api.h"
-#include "device.h"
+#include "device/device.h"
 #include "hardware/timer.h"
-#include "led-task.h"
-#include "profiling.h"
-#include "stdio-text-protocol.h"
+#include "led-task/led-task.h"
+#include "profiling/profiling.h"
+#include "stdio-text-protocol/stdio-text-protocol.h"
+#include "button-task/button-task.h"
 #include <ctype.h>
 #include <errno.h>
-#include <pico/types.h>
+#include "pico/types.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,6 +119,14 @@ static void led_period(const command_t *command) {
   print_response();
 }
 
+static void button(const command_t *command){
+  if(button_task_is_pressed()){
+    printf("button: pressed, presses %u\n", (unsigned)button_task_get_press_count());
+  }else{
+    printf("button: released, presses %u\n", (unsigned)button_task_get_press_count());
+  }
+}
+
 static const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
@@ -129,6 +138,7 @@ static const api_command_t api_commands[] = {
     {"led_disable", "switch off led", led_disable},
     {"led_blink", "start led blinking", led_blink},
     {"led_period", "sets period of led blinkiking", led_period},
+    {"button", "show button state", button},
 };
 
 static uint api_command_count =

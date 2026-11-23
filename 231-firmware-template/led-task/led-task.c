@@ -102,3 +102,13 @@ void print_response(void) {
     break;
   }
 }
+
+void led_task_next_state(void){
+  led_state_t led_state = led_task_get_state();
+  led_state++;
+  if (led_state > LED_STATE_BLINK)
+  {
+    led_state = 0;
+  }
+  led_task_set_state(led_state);
+}
