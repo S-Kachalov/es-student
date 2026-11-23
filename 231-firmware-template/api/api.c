@@ -1,7 +1,9 @@
-#include "api.h"
+#include "api/api.h"
 #include "device.h"
 #include "hardware/timer.h"
+#include "led-task.h"
 #include "profiling.h"
+#include "stdio-text-protocol.h"
 #include <ctype.h>
 #include <errno.h>
 #include <pico/types.h>
@@ -9,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 // обработчик команды: получает имя и аргументы
 typedef void (*api_callback_t)(const command_t *command);
 
@@ -88,6 +89,35 @@ static void cmd_calc_pi(const command_t *command) {
   printf("time: %llu ms\n", spent_us / 1000);
 }
 
+static void led_enable(const command_t *command) {
+  led_task_set_state(LED_STATE_ON);
+  print_response();
+}
+
+static void led_disable(const command_t *command) {
+  led_task_set_state(LED_STATE_OFF);
+  print_response();
+}
+
+static void led_blink(const command_t *command) {
+  led_task_set_state(LED_STATE_BLINK);
+  print_response();
+}
+
+static void led_period(const command_t *command) {
+  uint32_t period;
+  if (command->argc != 2 || !parse_u32(command->argv[0], &period)) {
+    printf("error: usage led_period <period_ms>\n");
+    return;
+  }
+  if (period == 0) {
+    printf("error: period_ms must be greater than 0\n");
+    return;
+  }
+  led_task_set_period_ms(period);
+  print_response();
+}
+
 static const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
@@ -95,6 +125,10 @@ static const api_command_t api_commands[] = {
     {"main_time_exec", "superloop iteration: average and maximum",
      main_time_exec},
     {"main_time_reset", "reset maximum iteration", main_time_reset},
+    {"led_enable", "switch on led", led_enable},
+    {"led_disable", "switch off led", led_disable},
+    {"led_blink", "start led blinking", led_blink},
+    {"led_period", "sets period of led blinkiking", led_period},
 };
 
 static uint api_command_count =

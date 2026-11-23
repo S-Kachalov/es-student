@@ -95,3 +95,5 @@ const command_t *stdio_text_protocol_handle(void) {
   // остальные символы игнорируем
   return NULL;
 }
+
+void stdio_text_protocol_init(void) { stdio_init_all(); }
