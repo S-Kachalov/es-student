@@ -1,13 +1,14 @@
 #include "api/api.h"
+#include "button-task/button-task.h"
 #include "device/device.h"
 #include "hardware/timer.h"
 #include "led-task/led-task.h"
+#include "pi-task/pi-task.h"
+#include "pico/types.h"
 #include "profiling/profiling.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
-#include "button-task/button-task.h"
 #include <ctype.h>
 #include <errno.h>
-#include "pico/types.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,20 +44,6 @@ static bool parse_u32(const char *text, uint32_t *value) {
   return true;
 }
 
-static double calc_pi(uint terms) {
-  double sum = 0.0;
-  double sign = 1.0;
-
-  for (int k = 0; k < terms; k++) {
-    // Прибавить очередной член ряда: ±1 / (2k + 1)
-    sum += sign / (2.0 * k + 1.0);
-    sign = -sign;
-  }
-
-  // Сумма ряда равна π/4
-  return 4.0 * sum;
-}
-
 static void cmd_info(const command_t *command) {
   // печатаем паспорт устройства
   device_info();
@@ -74,20 +61,6 @@ static void main_time_reset(const command_t *command) {
 
 static void uptime(const command_t *command) {
   printf("uptime: %llu ms\n", time_us_64() / 1000);
-}
-
-static void cmd_calc_pi(const command_t *command) {
-  uint32_t terms;
-  if (command->argc != 2 || !parse_u32(command->argv[0], &terms)) {
-    printf("error: usage calc_pi [terms]\n");
-    return;
-  }
-  uint64_t start_us = time_us_64();
-  volatile double pi_result = calc_pi(terms);
-  uint64_t spent_us = time_us_64() - start_us;
-
-  printf("pi: %.8f\n", pi_result);
-  printf("time: %llu ms\n", spent_us / 1000);
 }
 
 static void led_enable(const command_t *command) {
@@ -119,18 +92,54 @@ static void led_period(const command_t *command) {
   print_response();
 }
 
-static void button(const command_t *command){
-  if(button_task_is_pressed()){
-    printf("button: pressed, presses %u\n", (unsigned)button_task_get_press_count());
-  }else{
-    printf("button: released, presses %u\n", (unsigned)button_task_get_press_count());
+static void button(const command_t *command) {
+  if (button_task_is_pressed()) {
+    printf("button: pressed, presses %u\n",
+           (unsigned)button_task_get_press_count());
+  } else {
+    printf("button: released, presses %u\n",
+           (unsigned)button_task_get_press_count());
+  }
+}
+
+static void pi_start(const command_t *command) {
+  uint32_t terms;
+
+  if (command->argc != 2 || !parse_u32(command->argv[0], &terms)) {
+    printf("error: usage pi_start [<terms>]\n");
+    return;
+  }
+  if (terms == 0) {
+    printf("error: terms must be greater than 0\n");
+    return;
+  }
+  if (pi_task_start(terms)) {
+    printf("pi: started, %u terms\n", (unsigned)terms);
+  } else {
+    printf("error: pi is busy\n");
+  }
+}
+
+static void pi(const command_t *command) {
+  double pi;
+  uint64_t time;
+  // Ответить значением или сообщить, что расчёт ещё идёт
+  if (pi_task_get_result(&pi, &time)) {
+    printf("pi: %.9f in %llu ms\n", pi, time / 1000);
+    return;
+  }
+  if (pi_task_get_state() == NOT_STARTED) {
+    printf("pi : not started\n");
+    return;
+  } else if (pi_task_get_state() == RUNNING) {
+    printf("pi : running\n");
+    return;
   }
 }
 
 static const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
-    {"calc_pi", "calculate pi: calc_pi [terms]", cmd_calc_pi},
     {"main_time_exec", "superloop iteration: average and maximum",
      main_time_exec},
     {"main_time_reset", "reset maximum iteration", main_time_reset},
@@ -139,6 +148,8 @@ static const api_command_t api_commands[] = {
     {"led_blink", "start led blinking", led_blink},
     {"led_period", "sets period of led blinkiking", led_period},
     {"button", "show button state", button},
+    {"pi_start", "starts calculate pi", pi_start},
+    {"pi", "show result of pi calculation or state", pi},
 };
 
 static uint api_command_count =

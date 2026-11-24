@@ -1,7 +1,7 @@
 #include "api/api.h"
 #include "button-task/button-task.h"
 #include "led-task/led-task.h"
-#include "pico/stdlib.h"
+#include "pi-task/pi-task.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
 #include <string.h>
 
@@ -18,5 +18,6 @@ int main() {
     }
     led_task_handle();
     button_task_handle();
+    pi_task_handle();
   }
 }
