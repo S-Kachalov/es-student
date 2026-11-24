@@ -46,17 +46,36 @@ static bool parse_u32(const char *text, uint32_t *value) {
 
 static void cmd_info(const command_t *command) {
   // печатаем паспорт устройства
-  device_info();
+  device_info_t info;
+  device_get_info(&info);
+  printf("board: %s\n", info.board);
+  printf("serial: %s\n", info.serial);
+  printf("chip: manufacturer 0x%03x, part 0x%04x, revision %u\n",
+         (unsigned)info.manufacturer, (unsigned)info.part,
+         (unsigned)info.revision);
+  printf("pico-sdk: %s\n", info.sdk_version);
 }
 
-static void main_time_exec(const command_t *command) {
-  printf("iteration avg %.2f us, max %u us\n", profiling_avg_us(),
-         (unsigned)profiling_max_us());
+static void profiling(const command_t *command) {
+  for (int i = 0; i < STOPWATCH_COUNT; i++) {
+    profiling_result_t res;
+    if (profiling_get(i, &res)) {
+      if (res.count == 0) {
+        // Если замеров не было, среднее не считаем, чтобы не делить на 0
+        printf("%-10s count %-10u mean 0.00 us  max 0 us\n", res.name,
+               (unsigned)res.count);
+      } else {
+        float mean_us = (float)res.sum_us / (float)res.count;
+        printf("%-10s count %-10u mean %.2f us  max %u us\n", res.name,
+               (unsigned)res.count, mean_us, (unsigned)res.max_us);
+      }
+    }
+  }
 }
 
-static void main_time_reset(const command_t *command) {
-  profiling_reset_max();
-  printf("max reset\n");
+static void profiling_reset_cmd(const command_t *command) {
+  profiling_reset();
+  printf("profiling reset\n");
 }
 
 static void uptime(const command_t *command) {
@@ -140,9 +159,8 @@ static void pi(const command_t *command) {
 static const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
-    {"main_time_exec", "superloop iteration: average and maximum",
-     main_time_exec},
-    {"main_time_reset", "reset maximum iteration", main_time_reset},
+    {"profiling", "show all running stopwatches", profiling},
+    {"profiling_reset", "reset all running stopwatches", profiling_reset_cmd},
     {"led_enable", "switch on led", led_enable},
     {"led_disable", "switch off led", led_disable},
     {"led_blink", "start led blinking", led_blink},
