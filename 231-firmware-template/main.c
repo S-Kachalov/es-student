@@ -5,7 +5,7 @@
 #include "logging/log.h"
 #include "pi-task/pi-task.h"
 #include "profiling/profiling.h"
-#include "stdio_text_protocol/stdio-text-protocol.h"
+#include "stdio-text-protocol/stdio-text-protocol.h"
 #include <stddef.h>
 
 enum {

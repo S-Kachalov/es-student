@@ -38,7 +38,7 @@ target_link_libraries(${PROJECT_NAME}
 device
 logging
 profiling
-stdio_text_protocol
+stdio-text-protocol
 systime
     pico_stdlib
     hardware_gpio
