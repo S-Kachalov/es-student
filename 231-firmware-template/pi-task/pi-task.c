@@ -1,9 +1,8 @@
-#include "pi-task.h"
-#include "pico/stdlib.h"
-#include <pico/types.h>
-#include <stdint.h>
-// ценf члена ряда около 585 тактов.При 125 МГц это 4,7 мкс.
-// Обработчик задачи должен уложиться в 0,5 мс, а это около 100 членов
+#include "pi-task/pi-task.h"
+#include "systime/systime.h"
+
+//  ценa члена ряда около 585 тактов. При 125 МГц это 4,7 мкс.
+//  Обработчик задачи должен уложиться в 0,5 мс, а это около 100 членов
 #define PI_TERMS_PER_CALL 100
 
 // Состояние расчёта: должно пережить возврат из обработчика
@@ -52,12 +51,12 @@ void pi_task_handle(void) {
   if (end > pi_n) {
     end = pi_n;
   }
-  uint64_t start_us = time_us_64();
+  uint64_t start_us = systime_us();
   for (; pi_k < end; pi_k++) {
     pi_sum += pi_sign / (2.0 * pi_k + 1.0);
     pi_sign = -pi_sign;
   }
-  uint64_t spent_us = time_us_64() - start_us;
+  uint64_t spent_us = systime_us() - start_us;
   time += spent_us;
   if (pi_k == pi_n) {
     pi_result = 4.0 * pi_sum;

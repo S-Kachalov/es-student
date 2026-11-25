@@ -1,12 +1,11 @@
 #include "api/api.h"
 #include "button-task/button-task.h"
 #include "device/device.h"
-#include "hardware/timer.h"
 #include "led-task/led-task.h"
 #include "pi-task/pi-task.h"
-#include "pico/types.h"
 #include "profiling/profiling.h"
-#include "stdio-text-protocol/stdio-text-protocol.h"
+#include "stdio_text_protocol/stdio-text-protocol.h"
+#include "systime/systime.h"
 #include <ctype.h>
 #include <errno.h>
 #include <stdint.h>
@@ -57,6 +56,10 @@ static void cmd_info(const command_t *command) {
 }
 
 static void profiling(const command_t *command) {
+  if (!PROFILING_ENABLED) {
+    printf("profiling is disabled in this build\n");
+    return;
+  }
   for (int i = 0; i < STOPWATCH_COUNT; i++) {
     profiling_result_t res;
     if (profiling_get(i, &res)) {
@@ -79,22 +82,25 @@ static void profiling_reset_cmd(const command_t *command) {
 }
 
 static void uptime(const command_t *command) {
-  printf("uptime: %llu ms\n", time_us_64() / 1000);
+  printf("uptime: %u ms\n", (unsigned)systime_ms);
 }
 
 static void led_enable(const command_t *command) {
   led_task_set_state(LED_STATE_ON);
-  print_response();
+  printf("led: %s, period %u ms\n", "on",
+         ((unsigned)led_task_get_period_ms() / 1000));
 }
 
 static void led_disable(const command_t *command) {
   led_task_set_state(LED_STATE_OFF);
-  print_response();
+  printf("led: %s, period %u ms\n", "off",
+         ((unsigned)led_task_get_period_ms() / 1000));
 }
 
 static void led_blink(const command_t *command) {
   led_task_set_state(LED_STATE_BLINK);
-  print_response();
+  printf("led: %s, period %u ms\n", "blink",
+         ((unsigned)led_task_get_period_ms() / 1000));
 }
 
 static void led_period(const command_t *command) {
@@ -108,7 +114,20 @@ static void led_period(const command_t *command) {
     return;
   }
   led_task_set_period_ms(period);
-  print_response();
+  switch (led_task_get_state()) {
+  case LED_STATE_OFF:
+    printf("led: %s, period %u ms\n", "off",
+           ((unsigned)led_task_get_period_ms() / 1000));
+    break;
+  case LED_STATE_ON:
+    printf("led: %s, period %u ms\n", "on",
+           ((unsigned)led_task_get_period_ms() / 1000));
+    break;
+  case LED_STATE_BLINK:
+    printf("led: %s, period %u ms\n", "blink",
+           ((unsigned)led_task_get_period_ms() / 1000));
+    break;
+  }
 }
 
 static void button(const command_t *command) {
@@ -170,7 +189,7 @@ static const api_command_t api_commands[] = {
     {"pi", "show result of pi calculation or state", pi},
 };
 
-static uint api_command_count =
+static uint32_t api_command_count =
     (sizeof(api_commands) / sizeof(api_commands[0]));
 
 //****************************************************************************************************/

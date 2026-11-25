@@ -1,7 +1,7 @@
 #include "button-task/button-task.h"
 #include "hardware/gpio.h"
 #include "led-task/led-task.h"
-#include "pico/stdlib.h"
+#include "systime/systime.h"
 
 typedef enum {
   BUTTON_STATE_RELEASED,
@@ -22,7 +22,7 @@ void button_task_handle(void) {
   bool level = gpio_get(BUTTON_PIN);
 
   // читаем часы
-  uint64_t now_us = time_us_64();
+  uint64_t now_us = systime_us();
 
   // переходы по таблице; при переходе в «нажата»
   // увеличиваем счётчик и вызываем led_task_next_state()
@@ -40,7 +40,7 @@ void button_task_handle(void) {
     if (level) {
       // Возврат в «отпущена»: был дребезг
       button_state = BUTTON_STATE_RELEASED;
-    } else if (now_us - start_time_us >= DEBOUNCE_US) {
+    } else if (systime_period_elapsed(&start_time_us, DEBOUNCE_US)) {
       // Переход: «нажатие?» -> «нажата», засчитываем нажатие
       button_state = BUTTON_STATE_PRESSED;
       press_count++;
@@ -63,7 +63,7 @@ void button_task_handle(void) {
     if (!level) {
       // Возврат в «нажата»: был дребезг при отпускании
       button_state = BUTTON_STATE_PRESSED;
-    } else if (now_us - start_time_us >= DEBOUNCE_US) {
+    } else if (systime_period_elapsed(&start_time_us, DEBOUNCE_US)) {
       // Переход: «отпускание?» -> «отпущена»
       button_state = BUTTON_STATE_RELEASED;
     }

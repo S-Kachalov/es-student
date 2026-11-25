@@ -1,7 +1,6 @@
 #include "led-task/led-task.h"
-#include "pico/stdlib.h"
-#include <stdbool.h>
-#include <stdio.h>
+#include "hardware/gpio.h"
+#include "systime/systime.h"
 
 // Состояние задачи: внутреннее связывание, только для этого файла
 static led_state_t led_state;
@@ -12,24 +11,6 @@ bool led_blinking = false;
 
 // Вспомогательная функция: из других файлов её не вызвать
 static void led_set(bool on) { gpio_put(PICO_DEFAULT_LED_PIN, on); }
-
-static bool period_elapsed(uint64_t *last_us, uint64_t period_us) {
-  uint64_t now_us = time_us_64();
-
-  if (now_us - *last_us < period_us) {
-    return false;
-  }
-
-  // Следующее срабатывание отсчитывается от прошлого, а не от «сейчас»
-  *last_us += period_us;
-
-  // Отстали больше чем на период: не догонять, а начать отсчёт заново
-  if (now_us - *last_us >= period_us) {
-    *last_us = now_us;
-  }
-
-  return true;
-}
 
 bool led_task_set_period_ms(uint32_t period_ms) {
   // С нулевым полупериодом светодиод переключался бы
@@ -80,34 +61,17 @@ void led_task_handle(void) {
     // Светодиод установлен при входе в состояние, делать нечего
     break;
   case LED_STATE_BLINK:
-    if (period_elapsed(&last_toggle_us, (half_period_us * 2))) {
+    if (systime_period_elapsed(&last_toggle_us, (half_period_us * 2))) {
       gpio_put(PICO_DEFAULT_LED_PIN, !gpio_get(PICO_DEFAULT_LED_PIN));
     }
     break;
   }
 }
-void print_response(void) {
-  switch (led_state) {
-  case LED_STATE_OFF:
-    printf("led: %s, period %u ms\n", "off",
-           ((unsigned)led_task_get_period_ms() / 1000));
-    break;
-  case LED_STATE_ON:
-    printf("led: %s, period %u ms\n", "on",
-           ((unsigned)led_task_get_period_ms() / 1000));
-    break;
-  case LED_STATE_BLINK:
-    printf("led: %s, period %u ms\n", "blink",
-           ((unsigned)led_task_get_period_ms() / 1000));
-    break;
-  }
-}
 
-void led_task_next_state(void){
+void led_task_next_state(void) {
   led_state_t led_state = led_task_get_state();
   led_state++;
-  if (led_state > LED_STATE_BLINK)
-  {
+  if (led_state > LED_STATE_BLINK) {
     led_state = 0;
   }
   led_task_set_state(led_state);

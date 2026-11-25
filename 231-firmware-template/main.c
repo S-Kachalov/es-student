@@ -1,12 +1,12 @@
 #include "api/api.h"
 #include "button-task/button-task.h"
-#include "device/device.h"
+#include "firmware.h"
 #include "led-task/led-task.h"
 #include "logging/log.h"
 #include "pi-task/pi-task.h"
 #include "profiling/profiling.h"
-#include "stdio-text-protocol/stdio-text-protocol.h"
-#include <string.h>
+#include "stdio_text_protocol/stdio-text-protocol.h"
+#include <stddef.h>
 
 enum {
   STOPWATCH_LOOP,
@@ -27,7 +27,7 @@ int main() {
   profiling_stopwatch_init(STOPWATCH_BUTTON, "button");
   profiling_stopwatch_init(STOPWATCH_PI, "pi");
 
-  LOG_INF("%s %s\n", DEVICE_NAME, FIRMWARE_VERSION);
+  LOG_INF("%s %s\n", FIRMWARE_NAME, FIRMWARE_VERSION);
 
   while (1) {
     profiling_start(STOPWATCH_LOOP);
