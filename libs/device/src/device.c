@@ -1,5 +1,5 @@
 #include "device/device.h"
-
+#include "firmware.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sysinfo.h"
 #include "pico/unique_id.h"
@@ -7,6 +7,10 @@
 #include <stddef.h>
 
 void device_get_info(device_info_t *info) {
+  info->name = FIRMWARE_NAME;
+  info->version = FIRMWARE_VERSION;
+  info->project = FIRMWARE_PROJECT;
+  info->repo = FIRMWARE_REPO;
   info->board = DEVICE_BOARD;
   pico_get_unique_board_id_string(info->serial, sizeof(info->serial));
   volatile uint32_t *chip_id =

@@ -38,6 +38,10 @@ static void cmd_info(const command_t *command) {
   // печатаем паспорт устройства
   device_info_t info;
   device_get_info(&info);
+  printf("name: %s\n", info.name);
+  printf("version: %s\n", info.version);
+  printf("project: %s\n", info.project);
+  printf("repo: %s\n", info.repo);
   printf("board: %s\n", info.board);
   printf("serial: %s\n", info.serial);
   printf("chip: manufacturer 0x%03x, part 0x%04x, revision %u\n",
@@ -73,7 +77,7 @@ static void profiling_reset_cmd(const command_t *command) {
 }
 
 static void uptime(const command_t *command) {
-  printf("uptime: %u ms\n", (unsigned)systime_ms);
+  printf("uptime: %u ms\n", (unsigned)systime_ms());
 }
 
 static void led_enable(const command_t *command) {

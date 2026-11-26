@@ -6,6 +6,10 @@
 #endif
 
 typedef struct {
+  const char *name;
+  const char *version;
+  const char *project;
+  const char *repo;
   const char *board;
   char serial[17];
   uint32_t manufacturer;

@@ -19,6 +19,10 @@ target_compile_definitions(profiling PUBLIC
     PROFILING_ENABLED=1
 )
 
+target_include_directories(device PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_library(platform STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/platform.c
 )
