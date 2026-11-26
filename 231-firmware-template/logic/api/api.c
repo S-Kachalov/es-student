@@ -1,5 +1,5 @@
-#include "api/api.h"
-#include "api/api-commands.h"
+#include "logic/api/api.h"
+#include "logic/api/api-commands.h"
 #include <stdio.h>
 #include <string.h>
 

@@ -1,4 +1,4 @@
-#include "pi-task/pi-task.h"
+#include "logic/pi-task/pi-task.h"
 #include "systime/systime.h"
 
 //  ценa члена ряда около 585 тактов. При 125 МГц это 4,7 мкс.
