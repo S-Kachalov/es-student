@@ -4,6 +4,7 @@
 #include "led-task/led-task.h"
 #include "logging/log.h"
 #include "pi-task/pi-task.h"
+#include "platform/platform.h"
 #include "profiling/profiling.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
 #include <stddef.h>
@@ -17,9 +18,12 @@ enum {
 };
 
 int main() {
-  stdio_text_protocol_init();
+  platform_init();
+
+  LOG_INF("%s %s\n", FIRMWARE_NAME, FIRMWARE_VERSION);
+
+  // stdio_text_protocol_init();
   led_task_init();
-  button_task_init();
 
   profiling_stopwatch_init(STOPWATCH_LOOP, "loop");
   profiling_stopwatch_init(STOPWATCH_COMMAND, "command");
@@ -27,7 +31,7 @@ int main() {
   profiling_stopwatch_init(STOPWATCH_BUTTON, "button");
   profiling_stopwatch_init(STOPWATCH_PI, "pi");
 
-  LOG_INF("%s %s\n", FIRMWARE_NAME, FIRMWARE_VERSION);
+  button_task_init(led_task_next_state);
 
   while (1) {
     profiling_start(STOPWATCH_LOOP);

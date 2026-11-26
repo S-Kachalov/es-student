@@ -96,4 +96,4 @@ const command_t *stdio_text_protocol_handle(void) {
   return NULL;
 }
 
-void stdio_text_protocol_init(void) { stdio_init_all(); }
+//void stdio_text_protocol_init(void) { stdio_init_all(); }

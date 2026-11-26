@@ -1,7 +1,7 @@
 #include "button-task/button-task.h"
-#include "hardware/gpio.h"
-#include "led-task/led-task.h"
+#include "platform/platform.h"
 #include "systime/systime.h"
+#include <stdio.h>
 
 typedef enum {
   BUTTON_STATE_RELEASED,
@@ -12,14 +12,21 @@ typedef enum {
 
 static uint64_t start_time_us = 0;
 static const uint32_t DEBOUNCE_US = 20000;
-static const uint32_t BUTTON_PIN = 15;
 static uint32_t press_count = 0;
 static button_state_t button_state;
+
+static button_task_callback_t on_press_led_task;
+
+void button_task_init(button_task_callback_t on_press) {
+  if (on_press != NULL) {
+    on_press_led_task = on_press;
+  }
+}
 
 void button_task_handle(void) {
   // читаем уровень: нажатая кнопка замыкает вывод на землю и даёт ноль
   // т.е. везде где проверяем на нажатие на !level в if condition
-  bool level = gpio_get(BUTTON_PIN);
+  bool level = platform_button_read();
 
   // читаем часы
   uint64_t now_us = systime_us();
@@ -44,7 +51,7 @@ void button_task_handle(void) {
       // Переход: «нажатие?» -> «нажата», засчитываем нажатие
       button_state = BUTTON_STATE_PRESSED;
       press_count++;
-      led_task_next_state();
+      on_press_led_task();
     }
     break;
   }
@@ -70,12 +77,6 @@ void button_task_handle(void) {
     break;
   }
   }
-}
-
-void button_task_init(void) {
-  gpio_init(BUTTON_PIN);
-  gpio_set_dir(BUTTON_PIN, GPIO_IN);
-  gpio_pull_up(BUTTON_PIN);
 }
 
 bool button_task_is_pressed(void) {

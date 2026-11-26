@@ -1,4 +1,4 @@
-#include "api/api.h"
+#include "api/api-commands.h"
 #include "button-task/button-task.h"
 #include "device/device.h"
 #include "led-task/led-task.h"
@@ -8,19 +8,10 @@
 #include "systime/systime.h"
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-// обработчик команды: получает имя и аргументы
-typedef void (*api_callback_t)(const command_t *command);
-
-// команда прибора: имя, справка для help и обработчик
-typedef struct {
-  const char *name;
-  const char *help;
-  api_callback_t callback;
-} api_command_t;
 
 // Число без знака из десятичной записи. false — в записи не только цифры
 // или число не помещается в uint32_t.
@@ -175,7 +166,7 @@ static void pi(const command_t *command) {
   }
 }
 
-static const api_command_t api_commands[] = {
+const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
     {"profiling", "show all running stopwatches", profiling},
@@ -189,28 +180,5 @@ static const api_command_t api_commands[] = {
     {"pi", "show result of pi calculation or state", pi},
 };
 
-static uint32_t api_command_count =
+const uint32_t api_command_count =
     (sizeof(api_commands) / sizeof(api_commands[0]));
-
-//****************************************************************************************************/
-
-void api_handle(const command_t *command) {
-  if (command->truncated) {
-    printf("error: command longer than 63 characters or 4 arguments\n");
-    return;
-  }
-  if (strcmp(command->name, "help") == 0) {
-    printf("%-17s %s\n", "help", "list of commands");
-    for (uint32_t i = 0; i < api_command_count; i++) {
-      printf("%-17s %s\n", api_commands[i].name, api_commands[i].help);
-    }
-    return;
-  }
-  for (uint32_t i = 0; i < api_command_count; i++) {
-    if (strcmp(command->name, api_commands[i].name) == 0) {
-      api_commands[i].callback(command);
-      return;
-    }
-  }
-  printf("error: unknown command '%s', try help\n", command->name);
-}
