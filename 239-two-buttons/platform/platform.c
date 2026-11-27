@@ -8,11 +8,20 @@ static const platform_button_t buttons[BUTTON_COUNT] = {
 
 // запускает стандартный ввод-вывод и настраивает выводы
 void platform_init(void) {
+  /*
   for (uint i = 0; i < BUTTON_COUNT; i++) {
     gpio_init(buttons[i]);
     gpio_set_dir(buttons[i], GPIO_IN);
     gpio_pull_up(buttons[i]);
   }
+  */
+  gpio_init(BUTTON_PIN_1);
+  gpio_set_dir(BUTTON_PIN_1, GPIO_IN);
+  gpio_pull_up(BUTTON_PIN_1);
+
+  gpio_init(BUTTON_PIN_2);
+  gpio_set_dir(BUTTON_PIN_2, GPIO_IN);
+  gpio_pull_up(BUTTON_PIN_2);
 
   gpio_init(PICO_DEFAULT_LED_PIN);
   gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
