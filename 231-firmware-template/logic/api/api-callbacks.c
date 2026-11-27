@@ -136,9 +136,10 @@ static void button(const command_t *command) {
 }
 
 static void pi_start(const command_t *command) {
-  uint32_t terms;
+  uint32_t terms = PI_TERMS_DEFAULT;
 
-  if (command->argc != 2 || !parse_u32(command->argv[0], &terms)) {
+  if (command->argc > 2 ||
+      (command->argc == 2 && !parse_u32(command->argv[0], &terms))) {
     printf("error: usage pi_start [<terms>]\n");
     return;
   }
@@ -146,27 +147,28 @@ static void pi_start(const command_t *command) {
     printf("error: terms must be greater than 0\n");
     return;
   }
-  if (pi_task_start(terms)) {
-    printf("pi: started, %u terms\n", (unsigned)terms);
-  } else {
+  if (!pi_task_start(terms)) {
     printf("error: pi is busy\n");
+    return;
   }
+  printf("pi: started, %u terms\n", (unsigned)terms);
 }
 
 static void pi(const command_t *command) {
-  double pi;
-  uint64_t time;
-  // Ответить значением или сообщить, что расчёт ещё идёт
-  if (pi_task_get_result(&pi, &time)) {
-    printf("pi: %.9f in %llu ms\n", pi, time / 1000);
+  double value;
+  uint64_t ms;
+
+  if (pi_task_get_result(&value, &ms)) {
+    printf("pi: %.9f in %llu ms\n", value, (unsigned long long)ms);
     return;
   }
-  if (pi_task_get_state() == NOT_STARTED) {
-    printf("pi : not started\n");
-    return;
-  } else if (pi_task_get_state() == RUNNING) {
-    printf("pi : running\n");
-    return;
+  switch (pi_task_get_state()) {
+  case RUNNING:
+    printf("pi: running\n");
+    break;
+  default: // NOT_STARTED и любое неизвестное состояние
+    printf("pi: not started\n");
+    break;
   }
 }
 

@@ -3,10 +3,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define PI_TERMS_DEFAULT 1000000
+
 typedef enum {
   NOT_STARTED,
   RUNNING,
-  BUSY,
+  DONE,
 } pi_state_t;
 
 pi_state_t pi_task_get_state(void);
