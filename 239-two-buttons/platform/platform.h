@@ -5,8 +5,8 @@
 #define BUTTON_COUNT 2
 
 typedef enum {
-  BUTTON_PIN_1 = 14, // номер пина кнопки 1
-  BUTTON_PIN_2 = 15, // номер пина кнопки 2
+  BUTTON_PIN_1, // идентификатор кнопки 1
+  BUTTON_PIN_2, // идентификатор кнопки 2
 } platform_button_t;
 
 // запускает стандартный ввод-вывод и настраивает выводы
