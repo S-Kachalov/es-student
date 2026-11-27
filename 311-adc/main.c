@@ -4,6 +4,7 @@
 #include "logic/button-task/button-task.h"
 #include "logic/led-task/led-task.h"
 #include "logic/pi-task/pi-task.h"
+#include "logic/telemetry-task/telemetry-task.h"
 #include "platform/platform.h"
 #include "profiling/profiling.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
@@ -15,6 +16,7 @@ enum {
   STOPWATCH_LED,
   STOPWATCH_BUTTON,
   STOPWATCH_PI,
+  STOPWATCH_TELEMETRY,
 };
 
 int main() {
@@ -22,16 +24,16 @@ int main() {
 
   LOG_INF("%s %s\n", FIRMWARE_NAME, FIRMWARE_VERSION);
 
-  // stdio_text_protocol_init();
   led_task_init();
+  button_task_init(led_task_next_state);
+  telemetry_task_init(api_print_telemetry);
 
   profiling_stopwatch_init(STOPWATCH_LOOP, "loop");
   profiling_stopwatch_init(STOPWATCH_COMMAND, "command");
   profiling_stopwatch_init(STOPWATCH_LED, "led");
   profiling_stopwatch_init(STOPWATCH_BUTTON, "button");
   profiling_stopwatch_init(STOPWATCH_PI, "pi");
-
-  button_task_init(led_task_next_state);
+  profiling_stopwatch_init(STOPWATCH_TELEMETRY, "telemetry");
 
   while (1) {
     profiling_start(STOPWATCH_LOOP);
@@ -58,6 +60,11 @@ int main() {
     profiling_start(STOPWATCH_PI);
     pi_task_handle();
     profiling_stop(STOPWATCH_PI);
+
+    // --- Отправка телеметрии ---
+    profiling_start(STOPWATCH_TELEMETRY);
+    telemetry_task_handle();
+    profiling_stop(STOPWATCH_TELEMETRY);
 
     profiling_stop(STOPWATCH_LOOP);
   }

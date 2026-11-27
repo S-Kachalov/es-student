@@ -3,6 +3,7 @@
 #include "logic/button-task/button-task.h"
 #include "logic/led-task/led-task.h"
 #include "logic/pi-task/pi-task.h"
+#include "logic/telemetry-task/telemetry-task.h"
 #include "platform/platform.h"
 #include "profiling/profiling.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
@@ -173,16 +174,47 @@ static void pi(const command_t *command) {
   }
 }
 
-// напряжение на GP26 у platform, ответ voltage: <напряжение> V
 static void cmd_get_voltage(const command_t *command) {
   printf("voltage: %.3f V\n", platform_voltage_read());
 }
 
-// температура у platform, ответ temp: <температура> C
 static void cmd_get_temp(const command_t *command) {
   printf("temp: %.1f C\n", platform_temp_read());
 }
 
+static void cmd_tm_start(const command_t *command) {
+  uint32_t terms = TELEMETRY_DEFAULT_PERIOD_MS;
+
+  if (command->argc > 2 ||
+      (command->argc == 2 && !parse_u32(command->argv[0], &terms))) {
+    printf("error: usage tm_start [<period_ms>]\n");
+    return;
+  }
+  if (terms < 10) {
+    printf("error: period_ms must be at least 10\n");
+    return;
+  }
+  if (telemetry_task_start(terms)) {
+    printf("telemetry: started, period %u ms\n", (unsigned)terms);
+  }
+}
+
+static void cmd_tm_stop(const command_t *command) {
+  telemetry_task_stop();
+  printf("telemetry: stopped\n");
+}
+
+//============================================================================================//
+void api_print_telemetry(const telemetry_record_t *record) {
+  if (telemetry_task_get_state() == TELEMETRY_STATE_RUN) {
+    printf("tm: %llu %.3f %.1f\n", record->time_us, record->voltage_v,
+           record->temp_c);
+  } else {
+    return;
+  }
+}
+
+//============================================================================================//
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", uptime},
@@ -197,6 +229,8 @@ const api_command_t api_commands[] = {
     {"pi", "show result of pi calculation or state", pi},
     {"get_voltage", "voltage on GP26, ADC input 0", cmd_get_voltage},
     {"get_temp", "chip temperature, degrees Celsius", cmd_get_temp},
+    {"tm_start", "starts sending telemetry", cmd_tm_start},
+    {"tm_stop", "stops sending telemetry", cmd_tm_stop},
 };
 
 const uint32_t api_command_count =
