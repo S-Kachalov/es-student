@@ -3,8 +3,8 @@
 #include "logic/button-task/button-task.h"
 #include "logic/led-task/led-task.h"
 #include "logic/pi-task/pi-task.h"
-#include "profiling/profiling.h"
 #include "platform/platform.h"
+#include "profiling/profiling.h"
 #include "stdio-text-protocol/stdio-text-protocol.h"
 #include "systime/systime.h"
 #include <ctype.h>
@@ -174,11 +174,14 @@ static void pi(const command_t *command) {
 }
 
 // напряжение на GP26 у platform, ответ voltage: <напряжение> V
-static void cmd_get_voltage(const command_t *command){
+static void cmd_get_voltage(const command_t *command) {
   printf("voltage: %.3f V\n", platform_voltage_read());
 }
 
-
+// температура у platform, ответ temp: <температура> C
+static void cmd_get_temp(const command_t *command) {
+  printf("temp: %.1f C\n", platform_temp_read());
+}
 
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
@@ -193,6 +196,7 @@ const api_command_t api_commands[] = {
     {"pi_start", "starts calculate pi", pi_start},
     {"pi", "show result of pi calculation or state", pi},
     {"get_voltage", "voltage on GP26, ADC input 0", cmd_get_voltage},
+    {"get_temp", "chip temperature, degrees Celsius", cmd_get_temp},
 };
 
 const uint32_t api_command_count =
