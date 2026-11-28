@@ -204,6 +204,16 @@ static void cmd_tm_stop(const command_t *command) {
   printf("telemetry: stopped\n");
 }
 
+static void charge_on(const command_t *command) {
+  platform_charge_set(true);
+  printf("charge: on\n");
+}
+
+static void charge_off(const command_t *command) {
+  platform_charge_set(false);
+  printf("charge: off\n");
+}
+
 //============================================================================================//
 void api_print_telemetry(const telemetry_record_t *record) {
   if (telemetry_task_get_state() == TELEMETRY_STATE_RUN) {
@@ -231,6 +241,8 @@ const api_command_t api_commands[] = {
     {"get_temp", "chip temperature, degrees Celsius", cmd_get_temp},
     {"tm_start", "starts sending telemetry", cmd_tm_start},
     {"tm_stop", "stops sending telemetry", cmd_tm_stop},
+    {"charge_on", "starts charging of capacitor", charge_on},
+    {"charge_off", "stops charging of capacitor", charge_off},
 };
 
 const uint32_t api_command_count =

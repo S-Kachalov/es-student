@@ -16,3 +16,6 @@ float platform_voltage_read(void);
 
 // температура кристалла по встроенному датчику, градусы Цельсия
 float platform_temp_read(void);
+
+// 3,3 В на GP22 или ноль
+void platform_charge_set(bool on);
